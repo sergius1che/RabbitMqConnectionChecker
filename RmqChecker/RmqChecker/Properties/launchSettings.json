@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RmqChecker": {
+      "commandName": "Project",
+      "commandLineArgs": "-h 192.168.17.51 -v Queue.Trcont -l admin -w R@5q7H81$71! --queue Live.Ris.WorkingDemand.Notification --msgcnt 100"
+    }
+  }
+}
