@@ -21,11 +21,11 @@ namespace RmqChecker
             _options = opts;
             _rmqConnection = new RmqConnection(opts);
 
-            int success = 0, error = 0;
             Stopwatch getMsg = new Stopwatch(), setMsg = new Stopwatch(), onQueue = new Stopwatch();
 
             foreach (var queue in _options.Queues)
             {
+                int success = 0, error = 0;
                 Console.WriteLine($"Start processing on {queue} queue");
                 onQueue.Start();
 
@@ -43,12 +43,15 @@ namespace RmqChecker
                     catch (Exception ex)
                     {
                         getMsg.Reset();
-                        Console.WriteLine($"Error get message from {queue}. {ex.Message}");
+                        Console.Error.WriteLine($"Error get message from {queue}. {ex.MessageToConsoleString()}");
                     }
 
 
                     if (string.IsNullOrEmpty(msg))
+                    {
                         Console.WriteLine("WARNING: no take message");
+                        error++;
+                    }
                     else
                     {
                         try
@@ -58,17 +61,19 @@ namespace RmqChecker
                             setMsg.Stop();
                             Console.WriteLine($"Succes send message to {queue} on {setMsg.ElapsedMilliseconds} ms");
                             setMsg.Reset();
+                            success++;
                         }
                         catch (Exception ex)
                         {
                             setMsg.Reset();
-                            Console.WriteLine($"Error send message to {queue}. {ex.Message}");
+                            Console.Error.WriteLine($"Error send message to {queue}. {ex.MessageToConsoleString()}");
+                            error++;
                         }
                     }
                 }
 
                 onQueue.Stop();
-                Console.WriteLine($"End processing on {queue} queue. Finished in {onQueue.ElapsedMilliseconds} ms");
+                Console.WriteLine($"End processing on {queue} queue. Count: {_options.MessageCount} success: {success}, errors: {error}. Finished in {onQueue.ElapsedMilliseconds} ms");
                 onQueue.Reset();
             }
         }
