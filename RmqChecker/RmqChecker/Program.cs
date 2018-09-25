@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CommandLine;
 
 namespace RmqChecker
@@ -9,9 +10,14 @@ namespace RmqChecker
         {
             try
             {
-                var runner = new Runner();
+                Options options = null;
                 Parser.Default.ParseArguments<Options>(args)
-                    .WithParsed<Options>(opts => runner.Run(opts));
+                    .WithParsed<Options>(opts => options = opts);
+
+                using (var runner = new Runner())
+                {
+                    runner.Run(options);
+                }
 
                 Console.WriteLine("SUCCESS END");
             }
